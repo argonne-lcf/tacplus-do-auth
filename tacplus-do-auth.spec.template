@@ -1,0 +1,46 @@
+%define name @NAME@
+%define version @VERSION@
+%define release @RELEASE@
+%define versioned_root ${RPM_BUILD_DIR}/%{name}-%{version}
+
+Summary: tacplus-do-auth: TACACS+ Authorization script
+Name: %{name}
+Version: %{version}
+Release: %{release}
+BuildArch: noarch
+Source0: %{name}-%{version}-%{release}.tar
+Group: Applications/System
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
+Prefix: %{_prefix}
+Vendor: ANL
+License: MIT
+BuildRequires: redhat-rpm-config
+BuildRequires: python3-devel
+BuildRequires: python3
+Requires: python3
+Requires: python3-docopt
+
+%description
+tacplus-do-auth: An alternative TACACS+ Authorization script to the do_auth.py script included in the Fedora tacacs-extra rpm.
+
+%prep
+tar -xvf ${RPM_SOURCE_DIR}/%{name}-%{version}-%{release}.tar
+
+%install
+mkdir -p ${RPM_BUILD_ROOT}/etc
+mkdir -p ${RPM_BUILD_ROOT}/usr/local/sbin
+mkdir -p ${RPM_BUILD_ROOT}/usr/lib/python3.6/site-packages
+mv lib/tacplus ${RPM_BUILD_ROOT}/usr/lib/python3.6/site-packages
+mv src/* ${RPM_BUILD_ROOT}/usr/local/sbin
+mv etc/* ${RPM_BUILD_ROOT}/etc
+
+%clean
+rm -rf ${RPM_BUILD_DIR}/%{name}*
+
+%files
+%defattr(644,root,root)
+%doc README.md
+%attr(440,root,root) %config(noreplace) /etc/tacplus-do-auth.ini
+%{python3_sitelib}/tacplus/*.py
+%{python3_sitelib}/tacplus/__pycache__/*.pyc
+%attr(755,root,root) /usr/local/sbin/tacplus-do-auth.py
